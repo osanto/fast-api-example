@@ -1,5 +1,8 @@
 from fastapi import status, HTTPException, Depends, APIRouter
+from psycopg2 import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import DBAPIError
+from psycopg2.errors import UniqueViolation
 from .. import models, schemas, utils
 from .. database import get_db
 
@@ -22,8 +25,20 @@ def create_user(user: schemas.UserCreate,  db: Session = Depends(get_db)):
 
     new_user = models.User(**user.model_dump())
     db.add(new_user)
-    db.commit()
+
+    try:
+        db.commit()
+    except (IntegrityError, DBAPIError) as e:
+        db.rollback()
+
+        if isinstance(e.orig, UniqueViolation):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered",
+            )
+
+        raise 
+
     db.refresh(new_user)
     return new_user
-
 
