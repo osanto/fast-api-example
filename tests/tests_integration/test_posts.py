@@ -47,7 +47,7 @@ def test_get_one_post(authorized_client, test_posts):
 )
 def test_create_post(authorized_client, test_user, title, content, published):
     res = authorized_client.post(
-        f"/posts/", json={"title": title, "content": content, "published": published}
+        "/posts/", json={"title": title, "content": content, "published": published}
     )
     created_post = schemas.PostResponse(**res.json())
 
@@ -66,7 +66,7 @@ def test_create_post_default_published_true(authorized_client, test_user):
     assert res.status_code == 201
     assert created_post.title == data["title"]
     assert created_post.content == data["content"]
-    assert created_post.published == True
+    assert created_post.published is True
     assert created_post.user_id == test_user["id"]
 
 

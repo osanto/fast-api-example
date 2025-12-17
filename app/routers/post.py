@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import status, Response, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app import oauth2
@@ -79,7 +79,7 @@ def delete_post(
 
     post = post_query.first()
 
-    if post == None:
+    if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id: {id} does not exist",
@@ -107,7 +107,7 @@ def update_post(
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
-    if post == None:
+    if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id: {id} does not exist",

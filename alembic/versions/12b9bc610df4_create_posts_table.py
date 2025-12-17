@@ -1,9 +1,6 @@
 """create posts table
-
 Revision ID: 12b9bc610df4
-Revises: 
 Create Date: 2025-12-12 13:25:30.172709
-
 """
 
 from typing import Sequence, Union
