@@ -1,6 +1,7 @@
 import os
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     database_username: str
     database_password: str
@@ -14,5 +15,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = os.getenv("ENV_FILE", ".env.local")
         env_file_encoding = "utf-8"
+
 
 settings = Settings()

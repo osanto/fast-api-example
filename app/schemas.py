@@ -3,10 +3,12 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from pydantic.types import conint
 
+
 class Post(BaseModel):
     title: str
     content: str
     published: bool = True
+
 
 class UserResponse(BaseModel):
     id: int
@@ -14,34 +16,39 @@ class UserResponse(BaseModel):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+
 class PostResponse(Post):
     id: int
     created_at: datetime
     user_id: int
     user: UserResponse
 
+
 class PostOutput(BaseModel):
     Post: PostResponse
     votes: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class UserCreate(BaseModel):
     email: str
     password: str
+
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     id: Optional[str] = None
+
 
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
-    
-    
