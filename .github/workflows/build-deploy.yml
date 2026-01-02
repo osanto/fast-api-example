@@ -42,12 +42,15 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Check code formatting with Black
         run: black --check .
@@ -76,10 +79,11 @@ jobs:
       - name: Trigger Render deploy
         run: |
           echo "Starting deployment..."
-          RESPONSE=$(curl -X POST '${{ secrets.RENDER_DEPLOY_HOOK }}' -w "%{http_code}" -s -o /dev/null --fail || echo "000")
-          if [ "$RESPONSE" -eq 200 ]; then
-            echo "✅ Deployment succeeded!"
-            echo "App available at: https://fast-api-example-w11a.onrender.com/docs"
+          RESPONSE=$(curl -X POST '${{ secrets.RENDER_DEPLOY_HOOK }}' -w "%{http_code}" -s -o /dev/null || echo "000")
+          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 201 ] || [ "$RESPONSE" -eq 202 ]; then
+            echo "✅ Deployment triggered successfully! (HTTP $RESPONSE)"
+            echo "🚀 Render is building and deploying your application..."
+            echo "📱 App will be available at: https://fast-api-example-w11a.onrender.com/docs"
           else
             echo "❌ Deployment failed! Response code: $RESPONSE"
             exit 1
