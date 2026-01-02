@@ -1,0 +1,54 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: fast-api-db
+    env: docker
+    plan: starter
+    region: oregon
+    ipAllowList: []
+    databases:
+      - name: fastapi_db
+        user: fastapi_user
+
+  # Web Service
+  - type: web
+    name: fast-api-example
+    env: python
+    runtime: python-3.12
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: |
+      alembic upgrade head
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    rootDir: .
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fast-api-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: PYTHON_VERSION
+        value: 3.12.0
+    ignoredPaths:
+      - README.md
+      - "*.md"
+      - docs/**
+      - .github/**
+      - tests/**
+      - .gitignore
+      - __pycache__/**
+      - "*.pyc"
+      - venv/**
+      - reports/**
+      - ".env*"
